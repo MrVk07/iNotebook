@@ -3,6 +3,8 @@ const express = require('express')
 let path = require('path')
 var cors = require('cors')
 const dotenv = require('dotenv')
+const auth = require('./routes/auth')
+const notes = require('./routes/notes')
 connectToMongo();
 
 const app = express()
@@ -14,14 +16,14 @@ dotenv.config()
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
-app.use('/api/auth', require('./routes/auth'))
-app.use('/api/notes', require('./routes/notes'))
+app.use('/api/auth', auth)
+app.use('/api/notes', notes)
 
 const ___dirname = path.resolve();
-app.use('/', express.static(path.join(___dirname, '/frontend/build')));
-app.get('*', (req, res) =>
-    res.sendFile(path.join(___dirname, '/frontend/build/index.html'))
-);
+app.use(express.static('frontend/build/'))
+app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, 'frontend', 'build', 'index.html'))
+})
 
 app.use((err, req, res, next) => {
     res.status(500).send({ message: err.message })
